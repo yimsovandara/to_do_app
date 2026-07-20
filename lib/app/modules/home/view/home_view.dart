@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:to_do_app/app/modules/task/views/widgets/task_card.dart';
-
+import '../controller/home_controller.dart';
 import 'widget/card.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  String selectedFilter = 'All';
-
-  @override
   Widget build(BuildContext context) {
+    debugPrint("controller.tasks : ${controller.tasks.length}");
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -33,33 +27,39 @@ class _HomeViewState extends State<HomeView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TaskStatsCard(
-                    title: 'Tasks',
-                    quantity: 12,
-                    icon: Icons.checklist,
-                    iconColor: Colors.blue,
-                    onTap: () {},
+            Obx(
+              () => Row(
+                children: [
+                  Expanded(
+                    child: TaskStatsCard(
+                      title: 'Tasks',
+                      quantity: controller.tasks.length,
+                      icon: Icons.checklist,
+                      iconColor: Colors.blue,
+                      onTap: () {
+                        controller.selectedFilter.value = 'All';
+                      },
+                    ),
                   ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: TaskStatsCard(
-                    title: 'Completed',
-                    quantity: 8,
-                    icon: Icons.check_circle,
-                    iconColor: Colors.green,
-                    onTap: () {
-                      // Handle tap
-                    },
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TaskStatsCard(
+                      title: 'Completed',
+                      quantity: controller.tasks
+                          .where((t) => t.isCompleted)
+                          .length,
+                      icon: Icons.check_circle,
+                      iconColor: Colors.green,
+                      onTap: () {
+                        controller.selectedFilter.value = 'Completed';
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            SizedBox(height: 24),
-            Row(
+            const SizedBox(height: 24),
+            const Row(
               children: [
                 Text(
                   'All Tasks',
@@ -67,38 +67,51 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ],
             ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                _buildFilterButton('All'),
-                SizedBox(width: 12),
-                _buildFilterButton('Active'),
-                SizedBox(width: 12),
-                _buildFilterButton('Completed'),
-              ],
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 15,
-                itemBuilder: (context, index) {
-                  return TaskCard(
-                    title: 'Task ${index + 1}',
-                    description: 'Description for task ${index + 1}',
-                    dueDate: 'Due in ${index + 1} days',
-                    priority: TaskPriority.values[index % 3],
-                    isCompleted: index % 2 == 0,
-                    onToggleComplete: () {
-                      // Handle toggle complete
-                    },
-                    onEdit: () {
-                      // Handle edit
-                    },
-                    onDelete: () {
-                      // Handle delete
-                    },
-                  );
-                },
+            const SizedBox(height: 16),
+            Obx(
+              () => Row(
+                children: [
+                  _buildFilterButton('All'),
+                  const SizedBox(width: 12),
+                  _buildFilterButton('Active'),
+                  const SizedBox(width: 12),
+                  _buildFilterButton('Completed'),
+                ],
               ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: Obx(() {
+                final tasksToDisplay = controller.filteredTasks;
+                debugPrint("tasksToDisplay : $tasksToDisplay");
+                if (tasksToDisplay.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No tasks found.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: tasksToDisplay.length,
+                  itemBuilder: (context, index) {
+                    final task = tasksToDisplay[index];
+                    return TaskCard(
+                      task: task,
+                      onToggleComplete: () {
+                        controller.toggleTask(task.id);
+                      },
+                      onEdit: () {
+                        Get.toNamed('/create-task', arguments: task);
+                      },
+                      onDelete: () {
+                        controller.deleteTask(task.id);
+                      },
+                    );
+                  },
+                );
+              }),
             ),
           ],
         ),
@@ -114,19 +127,16 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildFilterButton(String label) {
-    final isSelected = selectedFilter == label;
+    final isSelected = controller.selectedFilter.value == label;
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          setState(() {
-            selectedFilter = label;
-          });
+          controller.selectedFilter.value = label;
         },
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected ? Colors.blue : Colors.white,
-
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
@@ -136,7 +146,6 @@ class _HomeViewState extends State<HomeView> {
               ),
             ],
           ),
-
           child: Center(
             child: Text(
               label,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../data/models/task_model/task_model.dart';
 import 'widgets/task_card.dart';
 
 class TaskView extends StatefulWidget {
@@ -9,27 +10,36 @@ class TaskView extends StatefulWidget {
 }
 
 class _TaskViewState extends State<TaskView> {
-  final List<Map<String, dynamic>> tasks = [
-    {
-      'title': 'Complete project design',
-      'description': 'Finalize UI mockups and design system',
-      'dueDate': 'Jun 5, 2026',
-      'priority': TaskPriority.high,
-      'isCompleted': false,
-    },
-    {
-      'title': 'Review code',
-      'description': 'Review pull requests from team members',
-      'dueDate': 'Jun 3, 2026',
-      'priority': TaskPriority.medium,
-      'isCompleted': false,
-    },
-    {
-      'title': 'Update documentation',
-      'dueDate': 'Jun 7, 2026',
-      'priority': TaskPriority.low,
-      'isCompleted': true,
-    },
+  final List<TaskModel> tasks = [
+    TaskModel(
+      id: '1',
+      title: 'Complete project design',
+      description: 'Finalize UI mockups and design system',
+      dueDate: DateTime(2026, 6, 5),
+      priority: TaskPriority.high,
+      isCompleted: false,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+    TaskModel(
+      id: '2',
+      title: 'Review code',
+      description: 'Review pull requests from team members',
+      dueDate: DateTime(2026, 6, 3),
+      priority: TaskPriority.medium,
+      isCompleted: false,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+    TaskModel(
+      id: '3',
+      title: 'Update documentation',
+      dueDate: DateTime(2026, 6, 7),
+      priority: TaskPriority.low,
+      isCompleted: true,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
   ];
 
   @override
@@ -42,20 +52,16 @@ class _TaskViewState extends State<TaskView> {
         itemBuilder: (context, index) {
           final task = tasks[index];
           return TaskCard(
-            title: task['title'],
-            description: task['description'],
-            dueDate: task['dueDate'],
-            priority: task['priority'],
-            isCompleted: task['isCompleted'],
+            task: task,
             onToggleComplete: () {
               setState(() {
-                tasks[index]['isCompleted'] = !tasks[index]['isCompleted'];
+                tasks[index] = task.copyWith(isCompleted: !task.isCompleted);
               });
             },
             onEdit: () {
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(SnackBar(content: Text('Edit: ${task['title']}')));
+              ).showSnackBar(SnackBar(content: Text('Edit: ${task.title}')));
             },
             onDelete: () {
               setState(() {

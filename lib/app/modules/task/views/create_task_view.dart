@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../data/model/task_model/task_model.dart';
+import '../../../data/models/task_model/task_model.dart';
 import '../controllers/task_controller.dart';
 import '../event/task_event.dart';
 
@@ -13,7 +13,9 @@ class CreateTaskView extends GetView<TaskController> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Task'),
+        title: Obx(
+          () => Text(controller.isEditing.value ? 'Edit Task' : 'Create Task'),
+        ),
         centerTitle: false,
         elevation: 0,
       ),
@@ -87,7 +89,7 @@ class CreateTaskView extends GetView<TaskController> {
                         value: priority,
                         child: Row(
                           children: [
-                            Container(
+                            Container(   
                               width: 12,
                               height: 12,
                               decoration: BoxDecoration(
@@ -204,7 +206,7 @@ class CreateTaskView extends GetView<TaskController> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: event.createTask,
+                      onPressed: event.saveTask,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -212,12 +214,16 @@ class CreateTaskView extends GetView<TaskController> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text(
-                        'Create Task',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                      child: Obx(
+                        () => Text(
+                          controller.isEditing.value
+                              ? 'Update Task'
+                              : 'Create Task',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),

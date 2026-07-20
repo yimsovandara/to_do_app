@@ -1,7 +1,8 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
 export "FLUTTER_ROOT=/Users/macos/Development/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/macos/My-Project/to_do_app"
+export "FLUTTER_APPLICATION_PATH=/Users/macos/Project-Learning/My-Project/to_do_app"
+export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/macos/Project-Learning/My-Project/to_do_app/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"

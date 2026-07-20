@@ -1,31 +1,22 @@
 import 'package:flutter/material.dart';
-
-enum TaskPriority { low, medium, high }
+import 'package:to_do_app/app/data/models/task_model/task_model.dart';
 
 class TaskCard extends StatelessWidget {
-  final String title;
-  final String? description;
-  final String? dueDate;
-  final TaskPriority priority;
-  final bool isCompleted;
+  final TaskModel task;
   final VoidCallback? onToggleComplete;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   const TaskCard({
     super.key,
-    required this.title,
-    this.description,
-    this.dueDate,
-    this.priority = TaskPriority.medium,
-    this.isCompleted = false,
+    required this.task,
     this.onToggleComplete,
     this.onEdit,
     this.onDelete,
   });
 
   Color _getPriorityColor() {
-    switch (priority) {
+    switch (task.priority) {
       case TaskPriority.low:
         return Colors.green;
       case TaskPriority.medium:
@@ -36,7 +27,7 @@ class TaskCard extends StatelessWidget {
   }
 
   String _getPriorityLabel() {
-    switch (priority) {
+    switch (task.priority) {
       case TaskPriority.low:
         return 'Low';
       case TaskPriority.medium:
@@ -44,6 +35,14 @@ class TaskCard extends StatelessWidget {
       case TaskPriority.high:
         return 'High';
     }
+  }
+
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
   @override
@@ -55,7 +54,7 @@ class TaskCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isCompleted ? Colors.green.shade300 : Colors.grey.shade200,
+          color: task.isCompleted ? Colors.green.shade300 : Colors.grey.shade200,
           width: 1,
         ),
         boxShadow: [
@@ -82,12 +81,12 @@ class TaskCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isCompleted ? Colors.green : Colors.grey.shade400,
+                      color: task.isCompleted ? Colors.green : Colors.grey.shade400,
                       width: 2,
                     ),
-                    color: isCompleted ? Colors.green : Colors.transparent,
+                    color: task.isCompleted ? Colors.green : Colors.transparent,
                   ),
-                  child: isCompleted
+                  child: task.isCompleted
                       ? const Icon(Icons.check, size: 16, color: Colors.white)
                       : null,
                 ),
@@ -97,28 +96,28 @@ class TaskCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      task.title,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: isCompleted
+                        color: task.isCompleted
                             ? Colors.grey.shade400
                             : Colors.black87,
-                        decoration: isCompleted
+                        decoration: task.isCompleted
                             ? TextDecoration.lineThrough
                             : null,
                       ),
                     ),
-                    if (description != null && description!.isNotEmpty) ...[
+                    if (task.description != null && task.description!.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
-                        description!,
+                        task.description!,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey.shade600,
-                          decoration: isCompleted
+                          decoration: task.isCompleted
                               ? TextDecoration.lineThrough
                               : null,
                         ),
@@ -154,7 +153,7 @@ class TaskCard extends StatelessWidget {
                 ),
               ),
               // Due Date
-              if (dueDate != null)
+              if (task.dueDate != null)
                 Row(
                   children: [
                     Icon(
@@ -164,7 +163,7 @@ class TaskCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      dueDate!,
+                      _formatDate(task.dueDate!),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:to_do_app/app/data/model/task_model/task_model.dart';
-import 'package:to_do_app/app/data/repositories/task_repository.dart';
+import 'package:to_do_app/app/data/models/task_model/task_model.dart';
+import 'package:to_do_app/app/data/repositories/task_repository/task_repository.dart';
+import '../../home/controller/home_controller.dart';
 import '../controllers/task_controller.dart';
 
 class TaskEvent {
@@ -12,7 +13,7 @@ class TaskEvent {
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: _controller.selectedDueDate.value ?? DateTime.now(),
-      firstDate: DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime(2030),
     );
     if (pickedDate != null) {
@@ -20,14 +21,15 @@ class TaskEvent {
     }
   }
 
-  Future<void> createTask() async {
+  Future<void> saveTask() async {
     if (_controller.formKey.currentState == null || !_controller.formKey.currentState!.validate()) {
       return;
     }
 
     try {
+      final isEdit = _controller.isEditing.value;
       final task = TaskModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: isEdit ? _controller.editingTaskId! : DateTime.now().millisecondsSinceEpoch.toString(),
         title: _controller.titleController.text.trim(),
         description: _controller.descriptionController.text.trim().isEmpty
             ? null
@@ -40,15 +42,26 @@ class TaskEvent {
         tags: _controller.tagsController.text.trim().isEmpty
             ? []
             : _controller.tagsController.text.split(',').map((tag) => tag.trim()).toList(),
-        createdAt: DateTime.now(),
+        createdAt: isEdit ? _controller.createdAt ?? DateTime.now() : DateTime.now(),
         updatedAt: DateTime.now(),
+        isCompleted: isEdit ? _controller.isCompleted : false,
       );
 
-      await _repository.createTask(task);
+      if (isEdit) {
+        await _repository.updateTask(task);
+      } else {
+        await _repository.createTask(task);
+      }
+
+      // Refresh HomeController tasks if registered
+      if (Get.isRegistered<HomeController>()) {
+        Get.find<HomeController>().loadTasks();
+      }
+
       Get.back();
       Get.snackbar(
         'Success',
-        'Task created successfully!',
+        isEdit ? 'Task updated successfully!' : 'Task created successfully!',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green.withValues(alpha: 0.8),
         colorText: Colors.white,
