@@ -1,23 +1,25 @@
-import 'package:get/get.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../database/app_data_base.dart';
 import '../../models/task_model/task_model.dart';
 
-class TaskRepository extends GetxService {
-  late final Database _db;
+class TaskRepository {
+  final DatabaseService databaseService;
+  TaskRepository(this.databaseService);
+
+  Database get _db => databaseService.db;
 
   List<TaskModel> _mapTasks(List<Map<String, Object?>> result) {
     return result.map(TaskModel.fromJson).toList();
   }
 
-  Future<void> init() async {
-    _db = await initDatabase();
-  }
-
   /// Create a new task
   Future<void> createTask(TaskModel task) async {
     try {
-      await _db.insert(tableName, task.toJson());
+      await _db.insert(
+        DatabaseService.tableName,
+        task.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     } catch (e) {
       throw Exception('Error creating task: $e');
     }
@@ -26,11 +28,14 @@ class TaskRepository extends GetxService {
   /// Get all tasks
   Future<List<TaskModel>> getAllTasks() async {
     try {
-      final result = await _db.query(tableName, orderBy: 'createdAt DESC');
+      final result = await _db.query(
+        DatabaseService.tableName,
+        orderBy: 'createdAt DESC',
+      );
 
       return _mapTasks(result);
     } catch (e) {
-      throw Exception('Error fetching tasks: $e');
+      throw Exception('Error fetching all tasks: $e');
     }
   }
 
@@ -38,14 +43,14 @@ class TaskRepository extends GetxService {
   Future<TaskModel?> getTaskById(String id) async {
     try {
       final result = await _db.query(
-        tableName,
+        DatabaseService.tableName,
         where: 'id = ?',
         whereArgs: [id],
       );
       if (result.isEmpty) return null;
       return TaskModel.fromJson(result.first);
     } catch (e) {
-      throw Exception('Error fetching task: $e');
+      throw Exception('Error fetching get all task: $e');
     }
   }
 
@@ -53,7 +58,7 @@ class TaskRepository extends GetxService {
   Future<List<TaskModel>> getCompletedTasks() async {
     try {
       final result = await _db.query(
-        tableName,
+        DatabaseService.tableName,
         where: 'isCompleted = ?',
         whereArgs: [1],
         orderBy: 'updatedAt DESC',
@@ -68,7 +73,7 @@ class TaskRepository extends GetxService {
   Future<List<TaskModel>> getActiveTasks() async {
     try {
       final result = await _db.query(
-        tableName,
+        DatabaseService.tableName,
         where: 'isCompleted = ?',
         whereArgs: [0],
         orderBy: 'priority DESC, dueDate ASC',
@@ -83,7 +88,7 @@ class TaskRepository extends GetxService {
   Future<List<TaskModel>> getTasksByCategory(String category) async {
     try {
       final result = await _db.query(
-        tableName,
+        DatabaseService.tableName,
         where: 'category = ?',
         whereArgs: [category],
         orderBy: 'createdAt DESC',
@@ -98,7 +103,7 @@ class TaskRepository extends GetxService {
   Future<void> updateTask(TaskModel task) async {
     try {
       await _db.update(
-        tableName,
+        DatabaseService.tableName,
         task.copyWith(updatedAt: DateTime.now()).toJson(),
         where: 'id = ?',
         whereArgs: [task.id],
@@ -134,7 +139,11 @@ class TaskRepository extends GetxService {
   /// Delete a task
   Future<void> deleteTask(String id) async {
     try {
-      await _db.delete(tableName, where: 'id = ?', whereArgs: [id]);
+      await _db.delete(
+        DatabaseService.tableName,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
     } catch (e) {
       throw Exception('Error deleting task: $e');
     }
@@ -143,7 +152,7 @@ class TaskRepository extends GetxService {
   /// Delete all tasks
   Future<void> deleteAllTasks() async {
     try {
-      await _db.delete(tableName);
+      await _db.delete(DatabaseService.tableName);
     } catch (e) {
       throw Exception('Error deleting all tasks: $e');
     }
@@ -152,7 +161,9 @@ class TaskRepository extends GetxService {
   /// Get task count
   Future<int> getTaskCount() async {
     try {
-      final result = await _db.rawQuery('SELECT COUNT(*) FROM $tableName');
+      final result = await _db.rawQuery(
+        'SELECT COUNT(*) FROM ${DatabaseService.tableName}',
+      );
       return Sqflite.firstIntValue(result) ?? 0;
     } catch (e) {
       throw Exception('Error getting task count: $e');
@@ -163,7 +174,7 @@ class TaskRepository extends GetxService {
   Future<int> getCompletedTaskCount() async {
     try {
       final result = await _db.rawQuery(
-        'SELECT COUNT(*) FROM $tableName WHERE isCompleted = 1',
+        'SELECT COUNT(*) FROM ${DatabaseService.tableName} WHERE isCompleted = 1',
       );
       return Sqflite.firstIntValue(result) ?? 0;
     } catch (e) {
@@ -171,7 +182,7 @@ class TaskRepository extends GetxService {
     }
   }
 
-  /// Close database
+  /// Close databases
   Future<void> closeDatabase() async {
     await _db.close();
   }

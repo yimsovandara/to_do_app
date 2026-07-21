@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:to_do_app/app/routes/app_page.dart';
 
-import 'package:to_do_app/app/data/repositories/task_repository/task_repository.dart';
+import 'app/data/database/app_data_base.dart';
+import 'app/data/repositories/task_repository/task_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final taskRepo = TaskRepository();
-  await taskRepo.init();
-  Get.put<TaskRepository>(taskRepo, permanent: true);
+
+  final databaseService = DatabaseService();
+  await databaseService.initDatabase();
+
+  Get.put<TaskRepository>(TaskRepository(databaseService), permanent: true);
 
   runApp(const MyApp());
 }

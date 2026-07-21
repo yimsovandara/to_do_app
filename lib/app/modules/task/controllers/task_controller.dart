@@ -4,12 +4,10 @@ import '../../../data/models/task_model/task_model.dart';
 
 class TaskController extends GetxController {
   final formKey = GlobalKey<FormState>();
-
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final categoryController = TextEditingController();
   final tagsController = TextEditingController();
-
   final selectedPriority = TaskPriority.medium.obs;
   final selectedDueDate = Rxn<DateTime>();
 
@@ -27,7 +25,7 @@ class TaskController extends GetxController {
       isEditing.value = true;
       editingTaskId = task.id;
       createdAt = task.createdAt;
-      isCompleted = task.isCompleted;
+      isCompleted = task.isCompleted == 1;
 
       titleController.text = task.title;
       descriptionController.text = task.description ?? '';

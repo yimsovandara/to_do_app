@@ -54,7 +54,7 @@ class TaskCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: task.isCompleted ? Colors.green.shade300 : Colors.grey.shade200,
+          color: task.isCompleted == 1 ? Colors.green.shade300 : Colors.grey.shade200,
           width: 1,
         ),
         boxShadow: [
@@ -81,12 +81,12 @@ class TaskCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: task.isCompleted ? Colors.green : Colors.grey.shade400,
+                      color: task.isCompleted == 1 ? Colors.green : Colors.grey.shade400,
                       width: 2,
                     ),
-                    color: task.isCompleted ? Colors.green : Colors.transparent,
+                    color: task.isCompleted == 1 ? Colors.green : Colors.transparent,
                   ),
-                  child: task.isCompleted
+                  child: task.isCompleted == 1
                       ? const Icon(Icons.check, size: 16, color: Colors.white)
                       : null,
                 ),
@@ -100,10 +100,10 @@ class TaskCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: task.isCompleted
+                        color: task.isCompleted == 1
                             ? Colors.grey.shade400
                             : Colors.black87,
-                        decoration: task.isCompleted
+                        decoration: task.isCompleted == 1
                             ? TextDecoration.lineThrough
                             : null,
                       ),
@@ -117,7 +117,7 @@ class TaskCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey.shade600,
-                          decoration: task.isCompleted
+                          decoration: task.isCompleted == 1
                               ? TextDecoration.lineThrough
                               : null,
                         ),

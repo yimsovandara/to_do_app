@@ -44,7 +44,7 @@ class TaskEvent {
             : _controller.tagsController.text.split(',').map((tag) => tag.trim()).toList(),
         createdAt: isEdit ? _controller.createdAt ?? DateTime.now() : DateTime.now(),
         updatedAt: DateTime.now(),
-        isCompleted: isEdit ? _controller.isCompleted : false,
+        isCompleted: isEdit ? (_controller.isCompleted ? 1 : 0) : 0,
       );
 
       if (isEdit) {

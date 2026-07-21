@@ -17,7 +17,7 @@ class _TaskViewState extends State<TaskView> {
       description: 'Finalize UI mockups and design system',
       dueDate: DateTime(2026, 6, 5),
       priority: TaskPriority.high,
-      isCompleted: false,
+      isCompleted: 0,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     ),
@@ -27,7 +27,7 @@ class _TaskViewState extends State<TaskView> {
       description: 'Review pull requests from team members',
       dueDate: DateTime(2026, 6, 3),
       priority: TaskPriority.medium,
-      isCompleted: false,
+      isCompleted: 0,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     ),
@@ -36,7 +36,7 @@ class _TaskViewState extends State<TaskView> {
       title: 'Update documentation',
       dueDate: DateTime(2026, 6, 7),
       priority: TaskPriority.low,
-      isCompleted: true,
+      isCompleted: 0,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     ),
@@ -55,7 +55,7 @@ class _TaskViewState extends State<TaskView> {
             task: task,
             onToggleComplete: () {
               setState(() {
-                tasks[index] = task.copyWith(isCompleted: !task.isCompleted);
+                tasks[index] = task.copyWith(isCompleted: task.isCompleted == 0 ? 1 : 0);
               });
             },
             onEdit: () {

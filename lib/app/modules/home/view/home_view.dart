@@ -4,12 +4,13 @@ import 'package:to_do_app/app/modules/task/views/widgets/task_card.dart';
 import '../controller/home_controller.dart';
 import 'widget/card.dart';
 
-class HomeView extends GetView<HomeController> {
-  const HomeView({super.key});
+class HomeView extends StatelessWidget {
+  HomeView({super.key});
+
+  final HomeController controller = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("controller.tasks : ${controller.tasks.length}");
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -46,7 +47,7 @@ class HomeView extends GetView<HomeController> {
                     child: TaskStatsCard(
                       title: 'Completed',
                       quantity: controller.tasks
-                          .where((t) => t.isCompleted)
+                          .where((t) =>  t.isCompleted == 1)
                           .length,
                       icon: Icons.check_circle,
                       iconColor: Colors.green,
@@ -83,7 +84,7 @@ class HomeView extends GetView<HomeController> {
             Expanded(
               child: Obx(() {
                 final tasksToDisplay = controller.filteredTasks;
-                debugPrint("tasksToDisplay : $tasksToDisplay");
+
                 if (tasksToDisplay.isEmpty) {
                   return const Center(
                     child: Text(

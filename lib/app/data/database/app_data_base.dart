@@ -1,18 +1,19 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-const String tableName = 'tasks';
-late Database db;
+class DatabaseService {
+  static const String tableName = 'tasks';
+  late Database db;
 
-Future<Database> initDatabase() async {
-  final dbPath = await getDatabasesPath();
-  final path = join(dbPath, 'todo_app.db');
+  Future<Database> initDatabase() async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'todo_app.db');
+    db = await openDatabase(path, version: 1, onCreate: _createTable);
+    return db;
+  }
 
-  return await openDatabase(path, version: 1, onCreate: _createTable);
-}
-
-Future<void> _createTable(Database db, int version) async {
-  await db.execute('''
+  Future<void> _createTable(Database db, int version) async {
+    await db.execute('''
       CREATE TABLE IF NOT EXISTS $tableName (
         id TEXT PRIMARY KEY,
         title TEXT NOT NULL,
@@ -26,4 +27,5 @@ Future<void> _createTable(Database db, int version) async {
         updatedAt TEXT NOT NULL
       )
     ''');
+  }
 }
